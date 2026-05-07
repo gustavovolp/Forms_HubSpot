@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora ROI - Componente Embed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --g: #00754a;
+      --orange: #ef8943;
+      --o_hover: #f58134;
+      --g-dim: rgba(0, 200, 122, 0.1);
+      --dark: #070B09;
+      --dark2: #0D1310;
+      --dark3: #131A16;
+      --dark4: #192019;
+      --border: rgba(0, 200, 122, 0.14);
+      --border2: rgba(255, 255, 255, 0.07);
+      --text: #E6EEE9;
+      --muted: #7A9485;
+      --warn: #FFB547;
+      --red: #FF6B6B;
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Fundo transparente para herdar da LP onde for embutido */
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .calc-wrapper {
+      max-width: 780px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--orange);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .2s;
+      letter-spacing: .3px;
+    }
+
+    .btn-primary:hover {
+      background: var(--o_hover);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 40px rgba(252, 180, 73, 0.377);
+    }
+
+    .qcard {
+      background: var(--dark3);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 38px;
+      display: none;
+      animation: slideIn .38s ease;
+    }
+
+    .qcard.active {
+      display: block;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .qstep {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 8px;
+    }
+
+    .qtext {
+      color: var(--text);
+      font-size: 21px;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 5px;
+    }
+
+    .qwhy {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 26px;
+      font-style: italic;
+    }
+
+    .opts {
+      display: grid;
+      gap: 9px;
+    }
+
+    .opts.c2 {
+      grid-template-columns: 1fr;
+    }
+
+    .opts.c1 {
+      grid-template-columns: 1fr;
+    }
+
+    .obtn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 17px;
+      background: var(--dark4);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all .2s;
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 400;
+    }
+
+    .obtn:hover {
+      border-color: var(--g);
+      background: var(--g-dim);
+    }
+
+    .obtn.sel {
+      border-color: var(--g);
+      background: var(--g-dim);
+      color: var(--g);
+      font-weight: 600;
+    }
+
+    .oradio {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 2px solid var(--border2);
+      flex-shrink: 0;
+      transition: all .2s;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .obtn.sel .oradio {
+      background: var(--g);
+      border-color: var(--g);
+    }
+
+    .oradio::after {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--dark);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .obtn.sel .oradio::after {
+      opacity: 1;
+    }
+
+    .obtn.chk .oradio {
+      border-radius: 4px;
+    }
+
+    .obtn.chk.sel .oradio {
+      background: var(--g);
+      border-color: var(--g);
+    }
+
+    .obtn.chk .oradio::after {
+      content: '✓';
+      font-size: 9px;
+      font-weight: 900;
+      color: var(--dark);
+      border-radius: 0;
+      width: auto;
+      height: auto;
+    }
+
+    .qnav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 26px;
+    }
+
+    .bnav {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 11px 22px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .bback {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border2);
+    }
+
+    .bback:hover {
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .bnext {
+      background: var(--orange);
+      color: var(--text);
+    }
+
+    .bnext:hover {
+      background: var(--o_hover);
+      transform: translateY(-1px);
+    }
+
+    .bnext:disabled {
+      background: var(--dark4);
+      color: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .gate {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 40px;
+      text-align: center;
+      display: none;
+      animation: slideIn .38s ease;
+    }
+
+    .gate.active {
+      display: block;
+    }
+
+    .gate-icon {
+      font-size: 44px;
+      margin-bottom: 14px;
+    }
+
+    .gate h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 34px;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .gate p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .fgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 13px;
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .fgrp {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .fgrp.full {
+      grid-column: 1/-1;
+    }
+
+    .fgrp label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .fgrp input,
+    .fgrp select {
+      background: var(--dark4);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s;
+      width: 100%;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none; /* Remove a seta padrão do sistema */
+    }
+
+    .fgrp input:focus,
+    .fgrp select:focus {
+      border-color: var(--g);
+    }
+
+    .fgrp input::placeholder {
+      color: var(--muted);
+    }
+
+    /* Adiciona uma setinha SVG customizada no select */
+    .fgrp select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237A9485' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      padding-right: 40px; /* Dá espaço para o texto não encostar na seta */
+      cursor: pointer;
+    }
+
+    /* Estiliza a cor de fundo do menu suspenso para não ficar branco */
+    .fgrp select option {
+      background-color: var(--dark3);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .fgrp input:focus {
+      border-color: var(--g);
+    }
+
+    .fgrp input::placeholder {
+      color: var(--muted);
+    }
+
+    .lgpd {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    .lgpd input {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      accent-color: var(--g);
+    }
+
+    .lgpd_label {
+      color: var(--text);
+    }
+
+
+    .result {
+      background: var(--dark3);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 46px 40px;
+      display: none;
+      animation: resIn .6s ease forwards;
+    }
+
+    .result.active {
+      display: block;
+    }
+
+    @keyframes resIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .res-header {
+        color: var(--text);
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .res-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--g-dim);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 15px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .res-header h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 34px;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .res-header p {
+      color: var(--text);
+      font-size: 14px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .mgrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 11px;
+      margin-bottom: 28px;
+    }
+
+    .mblock {
+      background: linear-gradient(135deg, rgba(0, 200, 122, .1), rgba(0, 200, 122, .04));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mblock::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--g);
+    }
+
+    .mval {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 1px;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .mlbl {
+      font-size: 11px;
+      color: var(--text);
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    .res-context {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.7;
+      border-left: 3px solid var(--border);
+      padding-left: 16px;
+      margin-bottom: 24px;
+    }
+
+    .alert-box {
+    color: var(--text);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 13.5px;
+    }
+
+    .al-warn {
+      background: rgba(255, 181, 71, .07);
+      border: 1px solid rgba(255, 181, 71, .22);
+      
+    }
+
+    .al-green {
+      background: rgba(0, 200, 122, .08);
+      border: 1px solid var(--border);
+      
+    }
+
+    .al-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .process-result {
+      margin-bottom: 24px;
+    }
+
+    .proc-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .proc-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      background: var(--dark4);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    .proc-badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      background: var(--dark3);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .proc-badge.highlighted {
+      background: rgba(0, 200, 122, .12);
+      border-color: rgba(0, 200, 122, .3);
+      color: var(--text);
+    }
+
+    .proc-text {
+      color: var(--muted);
+      flex: 1;
+      line-height: 1.5;
+    }
+
+    @media(max-width:768px) {
+      .fgrid {
+        grid-template-columns: 1fr;
+      }
+
+      .mgrid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .opts.c2 {
+        grid-template-columns: 1fr;
+      }
+
+      .qcard,
+      .gate,
+      .result {
+        padding: 24px;
+      }
+    }
+
+    
+  </style>
+</head>
+
+<body>
+
+  <div class="calc-wrapper">
+
+    <div class="qcard active" id="q1">
+      <div class="qstep">Pergunta 1 de 7</div>
+      <div class="qtext">Quantos colaboradores sua empresa tem?</div>
+      <div class="qwhy">Calibra todos os cálculos ao porte da sua operação de RH.</div>
+      <div class="opts c1">
+        <button class="obtn" onclick="sel(this,'q1')">
+          <div class="oradio"></div>1 - 3
+        </button>
+        <button class="obtn" onclick="sel(this,'q1')">
+          <div class="oradio"></div>4 - 50
+        </button>
+        <button class="obtn" onclick="sel(this,'q1')">
+          <div class="oradio"></div>51 - 200
+        </button>
+        <button class="obtn" onclick="sel(this,'q1')">
+          <div class="oradio"></div>201 - 500
+        </button>
+        <button class="obtn" onclick="sel(this,'q1')">
+          <div class="oradio"></div>501 - 1000
+        </button>
+        <button class="obtn" onclick="sel(this,'q1')">
+          <div class="oradio"></div>1001 - 5000
+        </button>
+        <button class="obtn" onclick="sel(this,'q1')">
+          <div class="oradio"></div>+5000
+        </button>
+      </div>
+      <div class="qnav">
+        <div></div><button class="bnav bnext" onclick="next(1)" disabled id="nx1">Próxima →</button>
+      </div>
+    </div>
+
+    <div class="qcard" id="q2">
+      <div class="qstep">Pergunta 2 de 7</div>
+      <div class="qtext">Quantas pessoas trabalham no seu RH ou DP hoje?</div>
+      <div class="qwhy">Inclua analistas, assistentes e coordenadores — todos que lidam com os processos.</div>
+      <div class="opts c2">
+        <button class="obtn" onclick="sel(this,'q2')">
+          <div class="oradio"></div>1 a 2 pessoas
+        </button>
+        <button class="obtn" onclick="sel(this,'q2')">
+          <div class="oradio"></div>3 a 5 pessoas
+        </button>
+        <button class="obtn" onclick="sel(this,'q2')">
+          <div class="oradio"></div>6 a 10 pessoas
+        </button>
+        <button class="obtn" onclick="sel(this,'q2')">
+          <div class="oradio"></div>Mais de 10 pessoas
+        </button>
+      </div>
+      <div class="qnav"><button class="bnav bback" onclick="back(2)">← Voltar</button><button class="bnav bnext"
+          onclick="next(2)" disabled id="nx2">Próxima →</button></div>
+    </div>
+
+    <div class="qcard" id="q3">
+      <div class="qstep">Pergunta 3 de 7</div>
+      <div class="qtext">Qual é o salário médio (bruto) da sua equipe de RH?</div>
+      <div class="qwhy">Transforma horas perdidas em R$ — quanto mais preciso, mais real é o resultado.</div>
+      <div class="opts c2">
+        <button class="obtn" onclick="sel(this,'q3')">
+          <div class="oradio"></div>Até R$ 3.000
+        </button>
+        <button class="obtn" onclick="sel(this,'q3')">
+          <div class="oradio"></div>R$ 3.001 a R$ 5.000
+        </button>
+        <button class="obtn" onclick="sel(this,'q3')">
+          <div class="oradio"></div>R$ 5.001 a R$ 8.000
+        </button>
+        <button class="obtn" onclick="sel(this,'q3')">
+          <div class="oradio"></div>Acima de R$ 8.000
+        </button>
+      </div>
+      <div class="qnav"><button class="bnav bback" onclick="back(3)">← Voltar</button><button class="bnav bnext"
+          onclick="next(3)" disabled id="nx3">Próxima →</button></div>
+    </div>
+
+    <div class="qcard" id="q4">
+      <div class="qstep">Pergunta 4 de 7 · Processo 01 — Admissão digital</div>
+      <div class="qtext">Como é feita a admissão de novos colaboradores hoje?</div>
+      <div class="qwhy">Meta com Roover: 48h, integrado ao eSocial, com checklist automático. Hoje, a média de mercado é
+        11 dias.</div>
+      <div class="opts c1">
+        <button class="obtn" onclick="sel(this,'q4')">
+          <div class="oradio"></div>Papel físico, e-mail e assinatura manual
+        </button>
+        <button class="obtn" onclick="sel(this,'q4')">
+          <div class="oradio"></div>Planilha de controle + documentos digitais
+        </button>
+        <button class="obtn" onclick="sel(this,'q4')">
+          <div class="oradio"></div>Sistema parcialmente digital
+        </button>
+        <button class="obtn" onclick="sel(this,'q4')">
+          <div class="oradio"></div>Admissão digital integrada ao eSocial
+        </button>
+      </div>
+      <div class="qnav"><button class="bnav bback" onclick="back(4)">← Voltar</button><button class="bnav bnext"
+          onclick="next(4)" disabled id="nx4">Próxima →</button></div>
+    </div>
+
+    <div class="qcard" id="q5">
+      <div class="qstep">Pergunta 5 de 7 · Processos 02 e 04 — Ponto e Atestados</div>
+      <div class="qtext">Como o RH lida com o controle de ponto, fechamento de folha e gestão de atestados hoje?</div>
+      <div class="qwhy">34% dos atestados chegam por WhatsApp ou e-mail — sem rastreio, sem controle do absenteísmo
+        real.</div>
+      <div class="opts c1">
+        <button class="obtn" onclick="sel(this,'q5')">
+          <div class="oradio"></div>Planilha + atestados por WhatsApp/e-mail
+        </button>
+        <button class="obtn" onclick="sel(this,'q5')">
+          <div class="oradio"></div>Relógio físico sem integração + atestados dispersos
+        </button>
+        <button class="obtn" onclick="sel(this,'q5')">
+          <div class="oradio"></div>Sistema de ponto integrado, atestados ainda manuais
+        </button>
+        <button class="obtn" onclick="sel(this,'q5')">
+          <div class="oradio"></div>Ponto e atestados totalmente digitais e integrados
+        </button>
+      </div>
+      <div class="qnav"><button class="bnav bback" onclick="back(5)">← Voltar</button><button class="bnav bnext"
+          onclick="next(5)" disabled id="nx5">Próxima →</button></div>
+    </div>
+
+    <div class="qcard" id="q6">
+      <div class="qstep">Pergunta 6 de 7 · Processos 03 e 05 — Reembolso e Conformidade</div>
+      <div class="qtext">Como estão os processos de reembolso e a conformidade com NR-1 na sua empresa?</div>
+      <div class="qwhy">Reembolso em 15 dias e falta de registros de PDIs e pesquisas de clima são os dois maiores
+        riscos operacionais e legais do RH hoje.</div>
+      <div class="opts c1">
+        <button class="obtn" onclick="sel(this,'q6')">
+          <div class="oradio"></div>Reembolso manual por e-mail + sem documentação NR-1
+        </button>
+        <button class="obtn" onclick="sel(this,'q6')">
+          <div class="oradio"></div>Reembolso parcialmente controlado + NR-1 incompleta
+        </button>
+        <button class="obtn" onclick="sel(this,'q6')">
+          <div class="oradio"></div>Reembolso em sistema + NR-1 com lacunas
+        </button>
+        <button class="obtn" onclick="sel(this,'q6')">
+          <div class="oradio"></div>Ambos automatizados e em conformidade
+        </button>
+      </div>
+      <div class="qnav"><button class="bnav bback" onclick="back(6)">← Voltar</button><button class="bnav bnext"
+          onclick="next(6)" disabled id="nx6">Próxima →</button></div>
+    </div>
+
+    <div class="qcard" id="q7">
+      <div class="qstep">Pergunta 7 de 7 — selecione todos que se aplicam</div>
+      <div class="qtext">Quais outros processos ainda são manuais ou pouco automatizados no seu RH?</div>
+      <div class="qwhy">Identifica oportunidades além dos 5 processos críticos do Roover.</div>
+      <div class="opts c1" id="q7opts">
+        <button class="obtn chk" onclick="multi(this)">
+          <div class="oradio"></div>Assinatura digital de contratos
+        </button>
+        <button class="obtn chk" onclick="multi(this)">
+          <div class="oradio"></div>Guarda e digitalização de documentos físicos
+        </button>
+        <button class="obtn chk" onclick="multi(this)">
+          <div class="oradio"></div>Tarefas repetitivas entre sistemas
+        </button>
+        <button class="obtn chk" onclick="multi(this)">
+          <div class="oradio"></div>Modelagem de processos internos de RH
+        </button>
+      </div>
+      <div class="qnav"><button class="bnav bback" onclick="back(7)">← Voltar</button><button class="bnav bnext"
+          onclick="toGate()">Ver diagnóstico →</button></div>
+    </div>
+
+    <div class="gate" id="gate">
+      <h3>Diagnóstico pronto!</h3>
+      <p>Calculamos o impacto por processo. Informe seus dados para ver o resultado.</p>
+      <div class="fgrid">
+        <div class="fgrp"><label>Nome</label><input required type="text" id="fn" placeholder="Ex: Mariana"></div>
+        <div class="fgrp"><label>Sobrenome</label><input required type="text" id="fs" placeholder="Ex: Silva"></div>
+        <div class="fgrp"><label>Telefone</label><input required type="tel" id="ft" placeholder="99 99999-9999"></div>
+        
+        <div class="fgrp"><label>Nome da empresa</label><input  required type="text" id="ne" placeholder="Ex: Selbetti"></div>
+        
+        <div class="fgrp full">
+          <label>Cargo</label>
+          <select id="fc" required>
+            <option value="" disabled selected>Selecione seu cargo</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Advogado">Advogado</option>
+            <option value="Analista">Analista</option>
+            <option value="Aprendiz">Aprendiz</option>
+            <option value="Assessor">Assessor</option>
+            <option value="Assistente">Assistente</option>
+            <option value="CEO - Dono Proprietário">CEO - Dono Proprietário</option>
+            <option value="Conselheiro">Conselheiro</option>
+            <option value="Consultor">Consultor</option>
+            <option value="Coordenador">Coordenador</option>
+            </select>
+        </div>
+
+        <div class="fgrp full"><label>E-mail corporativo</label><input type="email" id="fe" placeholder="mariana@empresa.com.br"></div>
+      </div>
+      <div class="lgpd">
+        <input type="checkbox" id="lgpd">
+        <label for="lgpd" class="lgpd_label">Concordo em receber comunicações da Selbetti e aceito a política de
+          privacidade. Dados
+          protegidos conforme a LGPD.</label>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center" onclick="showRes()">
+        Ver meu resultado gratuito
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="res-header">
+        <div class="res-badge">✓ Diagnóstico concluído</div>
+        <h3 style='color: #ffffff' id="rTitle">Seu RH tem potencial de ganho real</h3>
+        <p id="rSub">Resultado calculado com base nos processos que você indicou.</p>
+      </div>
+
+      <div class="mgrid">
+        <div class="mblock">
+          <div class="mval" id="mMes">—</div>
+          <div class="mlbl">Economia estimada / mês</div>
+        </div>
+        <div class="mblock">
+          <div class="mval" id="mAno">—</div>
+          <div class="mlbl">Economia estimada / ano</div>
+        </div>
+        <div class="mblock">
+          <div class="mval" id="mH">—</div>
+          <div class="mlbl">Horas recuperadas / mês</div>
+        </div>
+        <div class="mblock">
+          <div class="mval" id="mP">—</div>
+          <div class="mlbl">Payback estimado</div>
+        </div>
+      </div>
+
+      <div class="res-context" id="rCtx"></div>
+
+      <div id="alNR1"></div>
+      <div id="alPayback"></div>
+
+      <div class="process-result" id="procBreakdown">
+        <div class="proc-label">Impacto por processo identificado</div>
+        <div id="procItems"></div>
+      </div>
+
+      <div id="crossellWrap" style="display:none">
+        <div class="process-result">
+          <div class="proc-label">Outras oportunidades identificadas</div>
+          <div id="crossItems"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // STATE
+    const A = {};
+    let uName = '';
+
+   
+
+
+
+    function sel(btn, qid) {
+      btn.closest('.opts').querySelectorAll('.obtn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+
+      A[qid] = btn.textContent.trim();
+
+      const n = qid.replace('q', '');
+      const nx = document.getElementById('nx' + n);
+      if (nx) nx.disabled = false;
+    }
+
+    function multi(btn) {
+      btn.classList.toggle('sel');
+      A.q7 = Array.from(document.querySelectorAll('#q7opts .obtn.sel')).map(b => b.textContent.trim());
+    }
+
+    function next(n) {
+      document.getElementById('q' + n).classList.remove('active');
+      document.getElementById('q' + (n + 1)).classList.add('active');
+    }
+
+    function back(n) {
+      document.getElementById('q' + n).classList.remove('active');
+      document.getElementById('q' + (n - 1)).classList.add('active');
+    }
+
+    function toGate() {
+      for (let i = 1; i <= 7; i++)document.getElementById('q' + i).classList.remove('active');
+      document.getElementById('gate').classList.add('active');
+    }
+
+    // CALC
+    function calcROI() {
+      const nM = { '1 - 3': 2, '4 - 50': 27, '51 - 200': 125, '201 - 500': 350, '501 - 1000': 750, '1001 - 5000': 3000, '+5000': 5000 };
+      const tM = { '1 a 2 pessoas': 1.5, '3 a 5 pessoas': 4, '6 a 10 pessoas': 8, 'Mais de 10 pessoas': 12 };
+      const sM = { 'Até R$ 3.000': 2500, 'R$ 3.001 a R$ 5.000': 4000, 'R$ 5.001 a R$ 8.000': 6500, 'Acima de R$ 8.000': 9000 };
+      const N = nM[A.q1] || 425, T = tM[A.q2] || 4, S = sM[A.q3] || 4000;
+      const CH = (S * 1.72) / 176;
+
+      const admDias = { 'Papel físico, e-mail e assinatura manual': 11, 'Planilha de controle + documentos digitais': 7, 'Sistema parcialmente digital': 4, 'Admissão digital integrada ao eSocial': 2 };
+      const dAtual = admDias[A.q4] || 7;
+      const admissoes = N * 0.017;
+      const hrsAdmAtual = dAtual * 0.5;
+      const hrsAdmMeta = 2 * 0.5;
+      const econAdm = dAtual > 2 ? admissoes * (hrsAdmAtual - hrsAdmMeta) * CH : 0;
+      const horasAdm = dAtual > 2 ? Math.round(admissoes * (hrsAdmAtual - hrsAdmMeta)) : 0;
+
+      const pontoMult = { 'Planilha + atestados por WhatsApp/e-mail': 0.22, 'Relógio físico sem integração + atestados dispersos': 0.17, 'Sistema de ponto integrado, atestados ainda manuais': 0.08, 'Ponto e atestados totalmente digitais e integrados': 0.02 };
+      const mp = pontoMult[A.q5] || 0.17;
+      const horasPonto = T * 176 * mp;
+      const econPonto = horasPonto * 0.65 * CH;
+
+      const reimb = { 'Reembolso manual por e-mail + sem documentação NR-1': 0.25, 'Reembolso parcialmente controlado + NR-1 incompleta': 0.18, 'Reembolso em sistema + NR-1 com lacunas': 0.08, 'Ambos automatizados e em conformidade': 0 };
+      const mr = reimb[A.q6] || 0.18;
+      const horasReimb = T * 176 * mr * 0.3;
+      const econReimb = horasReimb * 0.6 * CH;
+
+      const econMes = Math.round(econAdm + econPonto + econReimb);
+      const econAno = econMes * 12;
+      const horasRec = Math.round(horasAdm + horasPonto * 0.65 + horasReimb * 0.6);
+      const payback = econMes > 0 ? +((N * 25) / econMes).toFixed(1) : 0;
+
+      return {
+        econMes, econAno, horasRec, payback, N, T, S, CH,
+        econAdm: Math.round(econAdm), econPonto: Math.round(econPonto), econReimb: Math.round(econReimb),
+        horasAdm, horasPonto: Math.round(horasPonto * 0.65), dAtual, mp
+      };
+    }
+
+    // COUNTER ANIMATION
+    function counter(el, target, prefix, suffix, dur = 1300) {
+      let start = null;
+      const step = ts => {
+        if (!start) start = ts;
+        const p = Math.min((ts - start) / dur, 1);
+        const e = 1 - Math.pow(1 - p, 3);
+        el.textContent = prefix + Math.round(target * e).toLocaleString('pt-BR') + suffix;
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = prefix + target.toLocaleString('pt-BR') + suffix;
+      };
+      requestAnimationFrame(step);
+    }
+
+    // SHOW RESULT
+    function showRes() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const utm_source = urlParams.get('utm_source') || "";
+      const utm_medium = urlParams.get('utm_medium') || "";
+      const utm_campaign = urlParams.get('utm_campaign') || "";
+      const utm_content = urlParams.get('utm_content') || "";
+      const utm_term = urlParams.get('utm_term') || "";
+      const dataPreenchimento = new Date().toISOString().split('T')[0];
+      
+      // O símbolo "?." garante que o código não trave se o ID não existir no HTML
+      const fn = document.getElementById('fn')?.value.trim() || "";
+      const fe = document.getElementById('fe')?.value.trim() || "";
+      const fc = document.getElementById('fc')?.value.trim() || "";
+      const fs = document.getElementById('fs')?.value.trim() || "";
+      const ft = document.getElementById('ft')?.value.trim() || "";
+      const ne = document.getElementById('ne')?.value.trim() || ""; // Se o seu ID de empresa no HTML for "femp", mude 'ne' para 'femp' aqui!
+
+      if (!fn || !fe) { alert('Por favor, preencha nome e e-mail para continuar.'); return; }
+      if (!fe.includes('@')) { alert('Informe um e-mail válido.'); return; }
+      uName = fn.split(' ')[0];
+
+      const roi = calcROI();
+
+      // CAPTURA DO COOKIE DO HUBSPOT
+      function getCookie(name) {
+        let value = "; " + document.cookie;
+        let parts = value.split("; " + name + "=");
+        if (parts.length === 2) return parts.pop().split(";").shift();
+      }
+      const hsCookie = getCookie('hubspotutk');
+
+      const portalId = '50574803';
+      const formId = "205656b4-5b86-4d90-8e29-8f79bc8bf9f5";
+
+      const data = {
+        "fields": [
+          { "name": "firstname", "value": fn },
+          { "name": "lastname", "value": fs },
+          { "name": "phone", "value": ft },
+          { "name": "email", "value": fe },
+          { "name": "cargo__c", "value": fc },
+          { "name": "nome_da_empresa", "value": ne }, // <-- Corrigido 'nome' para 'name'
+
+          { "name": "quantidadefuncionarios__c", "value": A.q1 || "" },
+          { "name": "process_tamanho_equipe_rh", "value": A.q2 || "" },
+          { "name": "process_salario_medio_rh", "value": A.q3 || "" },
+          { "name": "process_situacao_admissao", "value": A.q4 || "" },
+          { "name": "process_situacao_pontoatesta", "value": A.q5|| "" },
+          { "name": "process_situacao_reembolsonr1", "value": A.q6 || "" },
+          { "name": "process_processos_adicionais", "value": A.q7 ? A.q7.join(';') : "" },
+
+          { "name": "process_economia_mensal_r", "value": roi.econMes.toString() },
+          { "name": "process_economia_anual_r", "value": roi.econAno.toString() },
+          { "name": "process_horas_recuperadasmes", "value": roi.horasRec.toString() },
+          { "name": "process_payback_estimado_meses", "value": roi.payback.toString() },
+          
+          { "name": "utm_source", "value": utm_source },
+          { "name": "utm_medium", "value": utm_medium },
+          { "name": "utm_campaign", "value": utm_campaign },
+          { "name": "utm_content", "value": utm_content },
+          { "name": "utm_term", "value": utm_term },
+          { "name": "process_data_de_preenchimento", "value": dataPreenchimento }
+        ],
+        "context": {
+          "hutk": hsCookie,
+          "pageUri": window.location.href,
+          "pageName": document.title
+        }
+      };
+
+      fetch(`https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(response => {
+        if(!response.ok) {
+           console.log("O HubSpot recusou com erro:", response.status);
+        } else {
+           console.log('Dados enviados ao HubSpot com sucesso!');
+        }
+      }).catch(error => {
+        console.error('Erro ao enviar para o HubSpot:', error);
+      });
+
+      document.getElementById('rTitle').textContent = uName + ', calculamos o impacto por processo no seu RH';
+      document.getElementById('rSub').textContent = 'Baseado nos ' + (roi.dAtual > 2 ? 'processos manuais' : 'fluxos parcialmente digitais') + ' que você indicou, com ' + roi.N + ' colaboradores.';
+
+      document.getElementById('gate').classList.remove('active');
+      document.getElementById('result').classList.add('active');
+
+      setTimeout(() => {
+        counter(document.getElementById('mMes'), roi.econMes, 'R$ ', '');
+        counter(document.getElementById('mAno'), roi.econAno, 'R$ ', '');
+        counter(document.getElementById('mH'), roi.horasRec, '', 'h');
+        let s2 = null;
+        const dur = 1300;
+        const stepPb = ts => {
+          if (!s2) s2 = ts;
+          const p = Math.min((ts - s2) / dur, 1);
+          const e = 1 - Math.pow(1 - p, 3);
+          document.getElementById('mP').textContent = (roi.payback * e).toFixed(1).replace('.', ',') + ' mês';
+          if (p < 1) requestAnimationFrame(stepPb);
+          else document.getElementById('mP').textContent = String(roi.payback).replace('.', ',') + ' mês';
+        };
+        requestAnimationFrame(stepPb);
+      }, 300);
+
+      const admCtx = { 'Papel físico, e-mail e assinatura manual': 'admissão em papel (média: 11 dias)', 'Planilha de controle + documentos digitais': 'admissão via planilha (média: 7 dias)', 'Sistema parcialmente digital': 'admissão parcialmente digital (média: 4 dias)', 'Admissão digital integrada ao eSocial': 'admissão já digital (2 dias)' };
+      const pontoCtx = { 'Planilha + atestados por WhatsApp/e-mail': 'ponto em planilha e atestados sem rastreio', 'Relógio físico sem integração + atestados dispersos': 'relógio ponto sem integração e atestados dispersos', 'Sistema de ponto integrado, atestados ainda manuais': 'ponto integrado mas atestados ainda manuais', 'Ponto e atestados totalmente digitais e integrados': 'ponto e atestados já integrados' };
+      document.getElementById('rCtx').textContent =
+        `Cálculo baseado em: ${admCtx[A.q4] || 'processo de admissão atual'}, ${pontoCtx[A.q5] || 'gestão de ponto atual'} e situação de reembolso/NR-1 informada. O Roover automatiza esses processos integrado ao seu ${['Senior', 'TOTVS', 'SAP'][Math.floor(Math.random() * 3)]} — sem trocar nenhum sistema atual.`;
+
+      const nr1 = A.q6 || '';
+      const alEl = document.getElementById('alNR1');
+      if (nr1.includes('sem documentação NR-1')) {
+        alEl.innerHTML = `<div class="alert-box al-warn"><div class="al-icon">⚠️</div><div style='color: #ffffff;><strong style='color: #ffffff;>Risco NR-1 identificado:</strong> Sem registros de pesquisas de clima, treinamentos e PDIs, sua empresa está exposta a autuação trabalhista. Esse é o Processo 05 de maior urgência no seu diagnóstico.</div></div>`;
+      } else if (nr1.includes('NR-1 incompleta') || nr1.includes('NR-1 com lacunas')) {
+        alEl.innerHTML = `<div class="alert-box al-warn"><div class="al-icon">⚠️</div><div style='color: #ffffff;>Sua conformidade com a NR-1 ainda tem lacunas. Centralizar registros de clima, treinamento e PDI no Roover resolve isso sem projetos de longa duração.</div></div>`;
+      }
+
+      if (roi.payback > 0 && roi.payback < 3) {
+        document.getElementById('alPayback').innerHTML = `<div class="alert-box al-green"><div class="al-icon">⚡</div><div style='color: #ffffff;><strong style='color: #ffffff;'>Retorno antes do próximo fechamento de folha.</strong style='color: #ffffff;> Com payback de ${String(roi.payback).replace('.', ',')} mês, o investimento se paga na primeira competência.</div></div>`;
+      }
+
+      const items = [];
+      if (roi.econAdm > 0) items.push({ badge: 'Processo 01', label: 'Admissão digital end-to-end', detail: `De ${roi.dAtual} dias para 2 dias · economia estimada: R$ ${roi.econAdm.toLocaleString('pt-BR')}/mês`, hl: true });
+      if (roi.econPonto > 0) items.push({ badge: 'Processos 02+04', label: 'Ponto e gestão de atestados', detail: `${roi.horasPonto}h/mês recuperadas · economia estimada: R$ ${roi.econPonto.toLocaleString('pt-BR')}/mês`, hl: roi.mp >= 0.17 });
+      if (roi.econReimb > 0) items.push({ badge: 'Processos 03+05', label: 'Reembolso + Conformidade NR-1', detail: `Automação de aprovação e centralização de registros · economia estimada: R$ ${roi.econReimb.toLocaleString('pt-BR')}/mês`, hl: roi.econReimb > 500 });
+      document.getElementById('procItems').innerHTML = items.map(i =>
+        `<div class="proc-item"><span class="proc-badge${i.hl ? ' highlighted' : ''}">${i.badge}</span><div class="proc-text"><strong style="color:var(--text)">${i.label}</strong><br>${i.detail}</div></div>`
+      ).join('');
+
+      const q7 = A.q7 || [];
+      const cmap = {
+        'Assinatura digital de contratos': 'S-SIGN',
+        'Guarda e digitalização de documentos físicos': 'ECM + OCR',
+        'Tarefas repetitivas entre sistemas': 'RPA',
+        'Modelagem de processos internos de RH': 'BPMS'
+      };
+      const crossTexts = {
+        'Assinatura digital de contratos': 'Contratos e documentos com validade jurídica digital — integrado ao fluxo de admissão do Roover.',
+        'Guarda e digitalização de documentos físicos': 'Digitalização e gestão de prontuários e documentos físicos — acesso seguro, busca automática.',
+        'Tarefas repetitivas entre sistemas': 'Automação de lançamentos entre sistemas — sem trocar nenhum sistema atual.',
+        'Modelagem de processos internos de RH': 'Onboarding, offboarding e fluxos de aprovação modelados e automatizados.'
+      };
+
+      const citens = q7.filter(k => cmap[k]).slice(0, 2);
+      if (citens.length > 0) {
+        document.getElementById('crossellWrap').style.display = 'block';
+        document.getElementById('crossItems').innerHTML = citens.map(k =>
+          `<div class="proc-item"><span class="proc-badge">${cmap[k]}</span><span class="proc-text">${crossTexts[k]}</span></div>`
+        ).join('');
+      }
+    }
+  </script>
+</body>
+
+</html>
