@@ -42,7 +42,7 @@
     }
 
     .calc-wrapper {
-      max-width: 780px;
+      max-width: 1440px;
       margin: 0 auto;
       width: 100%;
     }
@@ -827,7 +827,7 @@
     <div class="result" id="result">
       <div class="res-header">
         <div class="res-badge">✓ Diagnóstico concluído</div>
-        <h3 style='color: #ffffff' id="rTitle">Seu RH tem potencial de ganho real</h3>
+        <h3 style='color: var(--orange)' id="rTitle">Seu RH tem potencial de ganho real</h3>
         <p id="rSub">Resultado calculado com base nos processos que você indicou.</p>
       </div>
 
@@ -871,12 +871,9 @@
   </div>
 
   <script>
-    // STATE
+   
     const A = {};
     let uName = '';
-
-   
-
 
 
     function sel(btn, qid) {
@@ -994,8 +991,8 @@
       }
       const hsCookie = getCookie('hubspotutk');
 
-      const portalId = '50574803';
-      const formId = "205656b4-5b86-4d90-8e29-8f79bc8bf9f5";
+      const portalId = '';
+      const formId = '';
 
       const data = {
         "fields": [
@@ -1078,13 +1075,13 @@
       const nr1 = A.q6 || '';
       const alEl = document.getElementById('alNR1');
       if (nr1.includes('sem documentação NR-1')) {
-        alEl.innerHTML = `<div class="alert-box al-warn"><div class="al-icon">⚠️</div><div style='color: #ffffff;><strong style='color: #ffffff;>Risco NR-1 identificado:</strong> Sem registros de pesquisas de clima, treinamentos e PDIs, sua empresa está exposta a autuação trabalhista. Esse é o Processo 05 de maior urgência no seu diagnóstico.</div></div>`;
+        alEl.innerHTML = `<div class="alert-box al-warn"><div class="al-icon">⚠️</div><div style='color: #ffffff';><strong style='color: #ffffff';>Risco NR-1 identificado:</strong> Sem registros de pesquisas de clima, treinamentos e PDIs, sua empresa está exposta a autuação trabalhista. Esse é o Processo 05 de maior urgência no seu diagnóstico.</div></div>`;
       } else if (nr1.includes('NR-1 incompleta') || nr1.includes('NR-1 com lacunas')) {
-        alEl.innerHTML = `<div class="alert-box al-warn"><div class="al-icon">⚠️</div><div style='color: #ffffff;>Sua conformidade com a NR-1 ainda tem lacunas. Centralizar registros de clima, treinamento e PDI no Roover resolve isso sem projetos de longa duração.</div></div>`;
+        alEl.innerHTML = `<div class="alert-box al-warn"><div class="al-icon">⚠️</div><div style='color: #ffffff';>Sua conformidade com a NR-1 ainda tem lacunas. Centralizar registros de clima, treinamento e PDI no Roover resolve isso sem projetos de longa duração.</div></div>`;
       }
 
       if (roi.payback > 0 && roi.payback < 3) {
-        document.getElementById('alPayback').innerHTML = `<div class="alert-box al-green"><div class="al-icon">⚡</div><div style='color: #ffffff;><strong style='color: #ffffff;'>Retorno antes do próximo fechamento de folha.</strong style='color: #ffffff;> Com payback de ${String(roi.payback).replace('.', ',')} mês, o investimento se paga na primeira competência.</div></div>`;
+        document.getElementById('alPayback').innerHTML = `<div class="alert-box al-green"><div class="al-icon">⚡</div><div style='color: #ffffff';><strong style='color: #ffffff';>Retorno antes do próximo fechamento de folha.</strong style='color: #ffffff';> Com payback de ${String(roi.payback).replace('.', ',')} mês, o investimento se paga na primeira competência.</div></div>`;
       }
 
       const items = [];
